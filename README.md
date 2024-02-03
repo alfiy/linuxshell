@@ -6,3 +6,10 @@
 openvpn.sh
 
 ### usage
+
+git clone https://github.com/alfiy/linuxshell.git
+
+cd linuxshell
+
+chmod +x openvpn.sh
+./openvpn
