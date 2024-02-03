@@ -1,11 +1,12 @@
 #!/bin/bash
+username=$(whoami)
 # 更新源
 sudo apt update && \
 # 安装依赖
 sudo apt install -y gcc make liblz4-dev libssl-dev liblzo2-dev libpam0g-dev && \
 
 # 进入下载目录
-cd /home/$(whoami)/Downloads/
+cd /home/$username/Downloads/
 
 # 下载openvpn源码包
 wget https://swupdate.openvpn.org/community/releases/openvpn-2.5.1.tar.gz && \
