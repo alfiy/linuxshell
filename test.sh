@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 
 OS=$(uname -s)
 ARCH=$(uname -m)
