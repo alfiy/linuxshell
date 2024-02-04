@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 username=$(whoami)
 # 更新源
 sudo apt update && \
