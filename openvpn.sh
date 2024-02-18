@@ -39,7 +39,7 @@ if [ -f /etc/lsb-release ]; then
         create_directory
         yum install -y epel-release
         yum update -y
-        yum install -y lz4-devel.x86_64 pam-devel.x86_64 wget curl openssl-devel NetworkManager-openvpn-gnome
+        yum install -y lz4-devel.x86_64 pam-devel.x86_64 wget curl openssl-devel NetworkManager-openvpn-gnome lzo-devel
         download_and_install_openvpn
         rm -rf "$TMP_DIR"
         reboot
@@ -51,7 +51,7 @@ elif [ -f /etc/redhat-release ]; then
         create_directory
         yum install -y epel-release
         yum update -y
-        yum install -y lz4-devel.x86_64 pam-devel.x86_64 wget curl openssl-devel NetworkManager-openvpn-gnome
+        yum install -y lz4-devel.x86_64 pam-devel.x86_64 wget curl openssl-devel NetworkManager-openvpn-gnome lzo-devel
         download_and_install_openvpn
         rm -rf "$TMP_DIR"
         reboot
