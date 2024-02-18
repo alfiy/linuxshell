@@ -1,30 +1,65 @@
 #!/bin/bash -e
-username=$(whoami)
-# 更新源
-sudo apt update && \
-# 安装依赖
-sudo apt install -y gcc make liblz4-dev libssl-dev liblzo2-dev libpam0g-dev && \
 
-# 进入下载目录
-cd /home/$username/Downloads/
+TMP_DIR="/home/tmp/"
+OPENVPN_VERSION="2.5.1"
 
-# 下载openvpn源码包
-wget https://swupdate.openvpn.org/community/releases/openvpn-2.5.1.tar.gz && \
+install_dependencies() {
+    sudo apt update
+    sudo apt install -y gcc make liblz4-dev libssl-dev liblzo2-dev libpam0g-dev
+}
 
-# 解压源码包
-tar -zxvf openvpn-2.5.1.tar.gz
+create_directory() {
+    if [ ! -d "$TMP_DIR" ]; then
+        mkdir -p "$TMP_DIR"
+    fi
+}
 
-# 进入源码目录
-cd openvpn-2.5.1/
+download_and_install_openvpn() {
+    cd "$TMP_DIR"
+    wget "https://swupdate.openvpn.org/community/releases/openvpn-$OPENVPN_VERSION.tar.gz"
+    tar -zxvf "openvpn-$OPENVPN_VERSION.tar.gz"
+    cd "openvpn-$OPENVPN_VERSION/"
+    ./configure && make -j$(nproc) && sudo make install
+}
 
-# 编译安装
-./configure
-wait
-sudo make -j$(nproc)
-wait
-sudo make install
+install_openvpn_manager() {
+    sudo apt install -y openvpn network-manager-openvpn network-manager-openvpn-gnome
+    sudo systemctl restart NetworkManager
+    sudo reboot
+}
 
-# 安装openvpn-manager
-sudo apt install -y openvpn network-manager-openvpn network-manager-openvpn-gnome && \
-sudo systemctl restart NetworkManager && \
-sudo reboot
+if [ -f /etc/lsb-release ]; then
+    source /etc/lsb-release
+    if [ "$DISTRIB_ID" == "Ubuntu" ]; then
+        install_dependencies
+        create_directory
+        download_and_install_openvpn
+        install_openvpn_manager
+    elif [ "$DISTRIB_ID" == "CentOS" ]; then
+        create_directory
+        yum install -y epel-release
+        yum update -y
+        yum install -y lz4-devel.x86_64 pam-devel.x86_64 wget curl openssl-devel NetworkManager-openvpn-gnome
+        download_and_install_openvpn
+        rm -rf "$TMP_DIR"
+        reboot
+    else
+        echo "Other Linux distribution"
+    fi
+elif [ -f /etc/redhat-release ]; then
+    if grep -q "CentOS" /etc/redhat-release; then
+        create_directory
+        yum install -y epel-release
+        yum update -y
+        yum install -y lz4-devel.x86_64 pam-devel.x86_64 wget curl openssl-devel NetworkManager-openvpn-gnome
+        download_and_install_openvpn
+        rm -rf "$TMP_DIR"
+        reboot
+    elif grep -q "Fedora" /etc/redhat-release; then
+        echo "Fedora"
+    else
+        echo "Other Linux distribution"
+    fi
+else
+    echo "Unknown Linux distribution"
+fi
